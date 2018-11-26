@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<title>Delaunay Triangulation</title>
+
+<div>
+	<canvas id="canvas" width="400" height="300" style="border: solid black 1px; cursor: default;"></canvas>
+</div>
+<div>
+	<input type="button" value="clear" onclick="demo.clear();" ondblclick="this.onclick();" />
+	<input type="button" value="add 1" onclick="demo.add(1);" ondblclick="this.onclick();" />
+	<input type="button" value="add 3" onclick="demo.add(3);" ondblclick="this.onclick();" />
+	<input type="button" value="add 50" onclick="demo.add(50);" ondblclick="this.onclick();" />
+	(or just click in the box)
+</div>
+
+<p>
+<a rel="license" href="http://creativecommons.org/licenses/publicdomain/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/publicdomain/88x31.png"/></a><br/>This work is dedicated to the <a rel="license" href="http://creativecommons.org/licenses/publicdomain/">Public Domain</a>.
+</p>
+
+<script type="text/javascript" src="canvas.js"></script>
+<script type="text/javascript" src="delaunay.js"></script>
+<script type="text/javascript">
+
+  function Demo() {
+    this.vertices = [];
+
+    this.addAt = function(x, y) {
+      this.vertices.push(new Vertex(x, y));
+      this.render();
+    };
+
+    this.add = function(n) {
+      var canvas = document.getElementById('canvas');
+      var w = Number(canvas.width), h = Number(canvas.height);
+      var inset = 25;
+
+      for (var i = 0; i < n; i++)
+        this.vertices.push(new Vertex(Math.random() * (w - 2 * inset) + inset, Math.random() * (h - 2 * inset) + inset));
+
+      this.render();
+    };
+
+    this.clear = function() {
+      this.vertices = [];
+      this.render();
+    }
+
+    this.render = function() {
+      var canvas = document.getElementById('canvas');
+      if (!canvas.getContext)
+        return;
+
+      var context = canvas.getContext('2d');
+      context.clearRect(0, 0, Number(canvas.width), Number(canvas.height));
+
+      this.vertices.forEach(function(vertex) {
+        context.beginPath();
+        context.arc(vertex.x, vertex.y, 5, 0, Math.PI * 2, true);
+        context.closePath();
+
+        context.fillStyle = "#0000ff";
+        context.fill();
+      });
+
+      var triangles = triangulate(this.vertices);
+
+      triangles.forEach(function(triangle) {
+
+        context.beginPath();
+        context.moveTo(triangle.v0.x, triangle.v0.y);
+        context.lineTo(triangle.v1.x, triangle.v1.y);
+        context.lineTo(triangle.v2.x, triangle.v2.y);
+        context.closePath();
+        context.strokeStyle = "#ff0000";
+        context.stroke();
+
+        // Display circumcircles
+        //			context.beginPath();
+        //			context.arc( triangle.center.x, triangle.center.y, triangle.radius, 0, Math.PI*2, true );
+        //			context.closePath();
+        //			context.strokeStyle= "#808080";
+        //			context.stroke();
+      });
+
+    };
+  };
+
+  var demo = new Demo();
+
+  window.onload = function() {
+    document.getElementById("canvas").onclick = function(e) {
+      e = e ? e : window.event;
+      var rect = this.getBoundingClientRect();
+      demo.addAt(e.clientX - rect.left, e.clientY - rect.top);
+    }
+  };
+
+</script>
+ <script>   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');   ga('create', 'UA-18610679-2', 'auto');   ga('send', 'pageview'); </script> 
