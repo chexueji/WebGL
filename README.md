@@ -1,6 +1,6 @@
 WebGL Projects
 ------------
-- 1.Delaunay Triangulation
+- Delaunay Triangulation
   - demo 1
   - demo 2 
 
